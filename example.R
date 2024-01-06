@@ -6,3 +6,6 @@ rnorm(1, 0 , 1)
 
 #this makes a boring plot
 plot(1:20, 2:21)
+
+#this makes a more funky plot
+plot(runif(20, 0, 3), rnorm(20, 5, 2))
