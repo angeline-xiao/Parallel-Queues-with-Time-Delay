@@ -439,15 +439,15 @@ particlefiltersim = function(laststate = state[i,], sim = simulations, mu = c(mu
 particlefilterasync = function(laststate = state[i,], sim = simulations, mu = c(mu1, mu2)){ #particle filter policy for asynchronous case
   Time = laststate$T   #includes all sample paths so if not plotting then use particlefilterasyncsim for efficiency
   if(laststate$T1 == 0){
-    len = nrow(sim[[i]])
     for (i in 1:100){
+      len = nrow(sim[[i]])
       updaterow = c(Time, laststate$N1, sim[[i]][len, 3])
       sim[[i]] = rbind(sim[[i]], updaterow)          
     }
     change = c(0, 0)
   }else if(laststate$T2 == 0){
-    len = nrow(sim[[i]])
     for (i in 1:100){
+      len = nrow(sim[[i]])
       updaterow = c(Time, sim[[i]][len, 2], laststate$N2)
       sim[[i]] = rbind(sim[[i]], updaterow)          
     }
@@ -513,8 +513,8 @@ particlefilterasyncsim = function(laststate = state[i,], sim = simulations, mu =
     }
     change = c(0, 0)
   }else if(laststate$T2 == 0){
-    len = nrow(sim[[i]])
     for (i in 1:100){
+      len = nrow(sim[[i]])
       updaterow = c(Time, sim[[i]][len, 2], laststate$N2)
       sim[[i]] = rbind(sim[[i]], updaterow)          
     }
@@ -778,7 +778,7 @@ plotasync = function(ntime = 1000, lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 =
   ggplot(data = dataa) +
     geom_line(aes(x = `T`, y=`N1`, colour = "N1/ \U003BC 1"), size = 1.1) +
     geom_line(aes(x = `T`, y=`N2`, colour = "N2/ \U003BC 2"), size = 1.1) + 
-    labs(subtitle = paste("\u03BB = ", lambda, ", \U003BC 1 = ", mu1, ", \U003BC 2 = ", mu2, ", \u03B2 1 = ", beta1, ", \u03B2 1 = ", beta2, sep= "")) +
+    labs(subtitle = paste("\u03BB = ", lambda, ", \U003BC 1 = ", mu1, ", \U003BC 2 = ", mu2, ", \u03B2 1 = ", beta1, ", \u03B2 2 = ", beta2, sep= "")) +
     xlab("Time") + 
     ylab("Queue Length") + 
     labs(colour='Queue') +
@@ -792,11 +792,12 @@ plotasync = function(ntime = 1000, lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 =
 #to plot sample path of particle filter in synchronous case
 #the titles and subtitles are not automated for this yet and must be manually changed
 
-particleplot = function(data){ 
+particleplot = function(ntime = 1000, lambda = 0.4, mu1 = 0.1, mu2 = 0.4, method = particlefilter, methodname = "particlefilter", beta = 0.01){ 
   #method used when generating data must be particle filter
+  data = syncsimulation(ntime = ntime, lambda = lambda, mu1 = mu1, mu2 = mu2, method = method, methodname = methodname, beta = beta)
   plot(x = NULL, y = NULL, xlim = c(200, 500), ylim = c(0, 40), 
        type = "n", xlab = "Time", ylab = "Wait Length", main = "Particle filter (synchronous updates)")
-  mtext("lambda = 0.4, mu1 = 0.1, mu2 = 0.4, beta = 0.01")
+  mtext(paste("\u03BB = ", lambda, ", \U003BC 1 = ", mu1, ", \U003BC 2 = ", mu2, ", \u03B2 = ", beta, sep= ""))
   
   # Loop through the list of data frames and add lines to the plot
   for (i in 1:100) {
@@ -817,13 +818,12 @@ particleplot = function(data){
 }
 
 
-#data = asyncsimulation(ntime = 1000, method = particlefilterasync, methodname = "particlefilter", beta1 = 0.01, beta2= 0.01, mu1 = 0.1, mu2 = 0.4)
 #to plot sample path of particle filter in asynchronous case
-#the titles and subtitles are not automated for this yet and must be manually changed
-
-particleplotasync = function(data){plot(x = NULL, y = NULL, xlim = c(0, 1000), ylim = c(0, 40), 
+particleplotasync = function(ntime = 1000, method = particlefilterasync, methodname = "particlefilter", beta1 = 0.01, beta2= 0.01, mu1 = 0.1, mu2 = 0.4, lambda = 0.4){
+  data = asyncsimulation(ntime = ntime, method = method, methodname = methodname, beta1 = beta1, beta2= beta2, mu1 = mu1, mu2 = mu2, lambda = lambda)
+  plot(x = NULL, y = NULL, xlim = c(0, 1000), ylim = c(0, 40), 
      type = "n", xlab = "Time", ylab = "Wait Length", main = "Particle filter with asynchronous updates")
-mtext("lambda = 0.4, mu1 = 0.1, mu2 = 0.4, beta1 = 0.01, beta2 = 0.01")
+mtext(paste("\u03BB = ", lambda, ", \U003BC 1 = ", mu1, ", \U003BC 2 = ", mu2, ", \u03B2 1 = ", beta1, ", \u03B2 2 = ", beta2, sep= ""))
 
 # Loop through the list of data frames and add lines to the plot
 for (i in 1:100) {
