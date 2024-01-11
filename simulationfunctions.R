@@ -580,13 +580,13 @@ syncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta = 0.1, ntim
   state = as.data.frame(matrix(nrow = ntime, ncol = 8))
   colnames(state) = c("T", "N1", "N2", "N1_", "N2_", "A1", "A2", "T0")
   state[1,] = startingstate
-  if(methodname == "Particle Filter" | methodname == "particlefilter"){
+  if(methodname == "particlefiltersim" | methodname == "particlefilter"){
     simulations = lapply(1:100, function(i) {
       df <- data.frame(matrix(c(state$T[1], state$N1[1], state$N2[1]), ncol = 3))
       colnames(df) <- c("T", "N1", "N2")
       df
     })
-  } else if(methodname == "Join the Shortest Estimated Queue 2"){
+  } else if(methodname == "jseq2" | methodname == "jsew2"){
     jseqdf = function() {
       df <- data.frame(matrix(c(state$T[1], state$N1[1], state$N2[1]), ncol = 3))
       colnames(df) <- c("T", "N1", "N2")
@@ -604,7 +604,7 @@ syncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta = 0.1, ntim
     state[i, c("T", "T0")] = state[i-1, c("T", "T0")] + min(timetonextevent)
     
     if(which.min(timetonextevent) == 1){ #arrive
-      if(methodname == "Particle Filter" | methodname == "particlefilter" | methodname == "Join the Shortest Estimated Queue 2"){
+      if(methodname == "particlefiltersim" | methodname == "particlefilter" | methodname == "jseq2"| methodname == "jsew2"){
         pf = method(laststate = state[i,], sim = simulations, mu = c(mu1, mu2))
         simulations = pf$sim
         change = pf$change
@@ -634,7 +634,7 @@ syncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta = 0.1, ntim
       timetonextevent["leave2"] = rexp(1, mu2)
     }
     else{ #update
-      if(methodname == "Particle Filter"| methodname == "particlefilter" | methodname == "Join the Shortest Estimated Queue 2"){
+      if(methodname == "particlefiltersim" | methodname == "particlefilter" | methodname == "jseq2"| methodname == "jsew2"){
         state[i, "T0"] = 0
         state[i, c("A1", "A2")] = 0
         state[i, c("N1_", "N2_")] = state[i, c("N1", "N2")]
@@ -664,13 +664,13 @@ asyncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 = 0.1, be
   state = as.data.frame(matrix(nrow = ntime, ncol = 9))
   colnames(state) = c("T", "N1", "N2", "N1_", "N2_", "A1", "A2", "T1", "T2")
   state[1,] = startingstate
-  if(methodname == "Particle Filter"| methodname == "particlefilter"){
+  if(methodname == "particlefilterasyncsim"| methodname == "particlefilterasync"){
     simulations = lapply(1:100, function(i) {
       df <- data.frame(matrix(c(state$T[1], state$N1[1], state$N2[1]), ncol = 3))
       colnames(df) <- c("T", "N1", "N2")
       df
     })
-  } else if(methodname == "Join the Shortest Estimated Queue 2"){
+  } else if(methodname == "jseq2async" | methodname == "jsew2async"){
     jseqdf = function() {
       df <- data.frame(matrix(c(state$T[1], state$N1[1], state$N2[1]), ncol = 3))
       colnames(df) <- c("T", "N1", "N2")
@@ -687,7 +687,7 @@ asyncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 = 0.1, be
     state[i, c("T", "T1", "T2")] = state[i-1, c("T", "T1", "T2")] + min(timetonextevent)
     
     if(which.min(timetonextevent) == 1){ #arrive
-      if(methodname == "Particle Filter"| methodname == "particlefilter" | methodname == "Join the Shortest Estimated Queue 2"){
+      if(methodname == "particlefilterasyncsim"| methodname == "particlefilterasync" | methodname == "jseq2async" | methodname == "jsew2async"){
         pf = method(laststate = state[i,], sim = simulations, mu = c(mu1, mu2))
         simulations = pf$sim
         change = pf$change
@@ -715,7 +715,7 @@ asyncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 = 0.1, be
       timetonextevent["leave2"] = rexp(1, mu2)
     }
     else if(which.min(timetonextevent) == 4){ #update1
-      if(methodname == "Particle Filter"| methodname == "particlefilter" | methodname == "Join the Shortest Estimated Queue 2"){
+      if(methodname == "particlefilterasyncsim"| methodname == "particlefilterasync" | methodname == "jseq2async" | methodname == "jsew2async"){
         state[i, "T1"] = 0
         state[i, "A1"] = 0
         state[i, c("N1_")] = state[i, c("N1")]
@@ -732,7 +732,7 @@ asyncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 = 0.1, be
       }
     }    
     else{ #update2
-      if(methodname == "Particle Filter"| methodname == "particlefilter" | methodname == "Join the Shortest Estimated Queue 2"){
+      if(methodname == "particlefilterasyncsim"| methodname == "particlefilterasync" | methodname == "jseq2async" | methodname == "jsew2async"){
         state[i, "T2"] = 0
         state[i, "A2"] = 0
         state[i, "N2_"] = state[i, "N2"]
@@ -749,7 +749,7 @@ asyncsimulation = function(lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 = 0.1, be
       }
     }
   }
-  if(methodname == "particlefilter"){
+  if(methodname == "particlefilterasync"){
     return(list(state = state, sim = simulations))
   } else {
     return(state = state)
@@ -792,9 +792,9 @@ plotasync = function(ntime = 1000, lambda = 0.4, mu1 = 0.25, mu2 = 0.25, beta1 =
 #to plot sample path of particle filter in synchronous case
 #the titles and subtitles are not automated for this yet and must be manually changed
 
-particleplot = function(ntime = 1000, lambda = 0.4, mu1 = 0.1, mu2 = 0.4, method = particlefilter, methodname = "particlefilter", beta = 0.01){ 
+particleplot = function(ntime = 1000, lambda = 0.4, mu1 = 0.1, mu2 = 0.4, beta = 0.01, startingstate = c(0, 10, 10, 10, 10, 0, 0, 0), method = particlefilter, methodname = "particlefilter"){ 
   #method used when generating data must be particle filter
-  data = syncsimulation(ntime = ntime, lambda = lambda, mu1 = mu1, mu2 = mu2, method = method, methodname = methodname, beta = beta)
+  data = syncsimulation(ntime = ntime, lambda = lambda, mu1 = mu1, mu2 = mu2, startingstate = c(0, 10, 10, 10, 10, 0, 0, 0), method = method, methodname = methodname, beta = beta)
   plot(x = NULL, y = NULL, xlim = c(200, 500), ylim = c(0, 40), 
        type = "n", xlab = "Time", ylab = "Wait Length", main = "Particle filter (synchronous updates)")
   mtext(paste("\u03BB = ", lambda, ", \U003BC 1 = ", mu1, ", \U003BC 2 = ", mu2, ", \u03B2 = ", beta, sep= ""))
@@ -819,8 +819,8 @@ particleplot = function(ntime = 1000, lambda = 0.4, mu1 = 0.1, mu2 = 0.4, method
 
 
 #to plot sample path of particle filter in asynchronous case
-particleplotasync = function(ntime = 1000, method = particlefilterasync, methodname = "particlefilter", beta1 = 0.01, beta2= 0.01, mu1 = 0.1, mu2 = 0.4, lambda = 0.4){
-  data = asyncsimulation(ntime = ntime, method = method, methodname = methodname, beta1 = beta1, beta2= beta2, mu1 = mu1, mu2 = mu2, lambda = lambda)
+particleplotasync = function(ntime = 1000, lambda = 0.4, mu1 = 0.1, mu2 = 0.4, beta1 = 0.01, beta2= 0.01, startingstate = c(0, 10, 10, 10, 10, 0, 0, 0, 0), method = particlefilterasync, methodname = "particlefilterasync"){
+  data = asyncsimulation(ntime = ntime, method = method, methodname = methodname, beta1 = beta1, beta2= beta2, mu1 = mu1, mu2 = mu2, lambda = lambda, startingstate = c(0, 10, 10, 10, 10, 0, 0, 0, 0))
   plot(x = NULL, y = NULL, xlim = c(0, 1000), ylim = c(0, 40), 
      type = "n", xlab = "Time", ylab = "Wait Length", main = "Particle filter with asynchronous updates")
 mtext(paste("\u03BB = ", lambda, ", \U003BC 1 = ", mu1, ", \U003BC 2 = ", mu2, ", \u03B2 1 = ", beta1, ", \u03B2 2 = ", beta2, sep= ""))
@@ -852,7 +852,7 @@ legend("topright", legend = c("N1/mu1", "N2/mu2"), col = c("red", "blue"), lty =
 
 #long term sampling and finding summary statistics for synchronous simulations
 
-difference = function(ntime = 500, lambda = 0.4, mu1 = 0.1, mu2 = 0.4, beta = 0.01,  startingstate  = c(0, 10, 10, 10, 10, 0, 0, 0), method = jseq1async, nsim = 30, methodname = "jseq1async"){
+difference = function(ntime = 500, lambda = 0.4, mu1 = 0.1, mu2 = 0.4, beta = 0.01,  startingstate  = c(0, 10, 10, 10, 10, 0, 0, 0), method = randomqueue, nsim = 30, methodname = "randomqueue"){
   x = matrix(ncol = 6)
   colnames(x) = c("absolute difference", "difference", "absolute proportional difference", "proportional difference", "average queue 1 length", "average queue 2 length")
   
